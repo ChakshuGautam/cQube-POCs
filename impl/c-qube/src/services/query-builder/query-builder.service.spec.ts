@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { truncate } from 'fs';
 import { JSONSchema4 } from 'json-schema';
 import { QueryBuilderService } from './query-builder.service';
 
@@ -28,6 +29,21 @@ describe('QueryBuilderService', () => {
     expect(createStatement).toBe(
       'CREATE TABLE my_schema.my_table (\n  id integer\n);',
     );
+  });
+
+  it('generates a create statement with a single not null integer column', () => {
+    const jsonSchema = {
+      title: 'my_table',
+      properties: {
+        id: { type: 'integer' ,
+      notNull: true},
+      },
+    };
+
+    const createStatement = service.generateCreateStatement(
+      jsonSchema as JSONSchema4,
+    );
+    expect(createStatement).toBe('CREATE TABLE my_table (\n  id integer NOT NULL\n);');
   });
 
   it('generates a create statement with a single string column', () => {
